@@ -6,21 +6,24 @@
     counter db 0
 
 .code
-org 100h    ; For .COM file structure
+org 100h
 
 start:
     ; Jump over data declarations
     jmp main
 
-main proc
+main:
     ; Set data segment
     mov ax, @data
     mov ds, ax
 
 check_key:
-    ; Wait for key press (AH = scan code, AL = ASCII)
+    ; Wait for key press
     mov ah, 00h
     int 16h
+    ; AL = ASCII, AH = Scan code
+
+    mov bl, ah  ; Save scan code for later
 
     ; Check if key is '5'
     cmp al, '5'
@@ -31,7 +34,6 @@ check_key:
     jmp check_exit
 
 increment_counter:
-    ; Increase counter and check if >=5
     inc counter
     cmp counter, 5
     jl check_exit
@@ -45,13 +47,11 @@ increment_counter:
     mov counter, 0
 
 check_exit:
-    ; Exit if Esc pressed (scan code 01h)
-    cmp ah, 01h
+    cmp bl, 01h      ; ESC key scan code
     jne check_key
 
     ; Terminate program
     mov ax, 4C00h
     int 21h
-main endp
 
 end start
